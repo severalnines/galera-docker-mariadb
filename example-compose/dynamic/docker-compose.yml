@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  mariadb_galera:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 10
+        window: 100s
+      update_config:
+        parallelism: 1
+        delay: 3m # higher than SST duration
+    image: severalnines/mariadb:10.1
+    hostname: "{{.Service.Name}}-{{.Task.Slot}}"
+    ports:
+      - "3306:3306"
+    environment:
+      CLUSTER_NAME: "MariaDB_Galera"
+      DISCOVERY_SERVICE: "192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379"
+      MYSQL_ROOT_PASSWORD: "mypassword123"
+      XTRABACKUP_PASSWORD: "mypassword123"
+    command:
+      - --innodb_buffer_pool_size=256M
+      - --max_connections=81
+    networks:
+      - galera_net
+    healthcheck:
+      interval: 5s
+      timeout: 3s
+      retries: 200 # interval * retries > SST duration
+
+networks:
+  galera_net:
+    driver: overlay

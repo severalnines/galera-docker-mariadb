@@ -1,0 +1,28 @@
+# only run this one if you want to do DB preparation before running on global
+# db_galera_net must be created beforehand, e.g: 
+#    $ docker network create db_galera_net -d overlay
+
+version: '3'
+
+services:
+
+  mariadb_galera:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 5
+    image: severalnines/mariadb:10.1
+    hostname: "{{.Service.Name}}.{{.Task.Slot}}"
+    environment:
+      CLUSTER_NAME: "MariaDB_Galera"
+      DISCOVERY_SERVICE: "192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379"
+      MYSQL_ROOT_PASSWORD: "mypassword123"
+      XTRABACKUP_PASSWORD: "mypassword123"
+    networks:
+      - db_galera_net
+
+networks:
+  db_galera_net:
+    external: true

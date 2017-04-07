@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  mariadb_galera:
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 10
+      placement:
+        constraints:
+          - node.labels.database == galera # node must be labelled accordingly
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1.5G
+        reservations:
+          memory: 1G
+      update_config:
+        parallelism: 1
+        delay: 3m # must be higher than SST duration
+    image: severalnines/mariadb:10.1
+    hostname: "{{.Service.Name}}-{{.Task.Slot}}"
+    ports:
+      - 3306:3306
+    environment:
+      CLUSTER_NAME: "MariaDB_Galera"
+      DISCOVERY_SERVICE: "192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379"
+      MYSQL_ROOT_PASSWORD: "mypassword123"
+      XTRABACKUP_PASSWORD: "mypassword123"
+    command:
+      - --innodb_buffer_pool_size=512M
+      - --max_connections=51
+      - --wsrep_slave_thread=4
+      - --wsrep_provider_options=gcache.size=1G
+    networks:
+      - db_galera_net
+    volumes:
+      - datadir:/var/lib/mysql
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 40000
+    healthcheck:
+      interval: 10s
+      retries: 20 # interval * retries > SST duration
+
+networks:
+  db_galera_net:
+    driver: overlay
+
+volumes:
+  datadir:

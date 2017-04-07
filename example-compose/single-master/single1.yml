@@ -1,0 +1,40 @@
+# single1 with galera=writer1 placement constraints.
+# create network beforehand:
+#  $ docker create network galera_net -d overlay
+
+version: '3'
+
+services:
+
+  mariadb_galera:
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+      update_config:
+        parallelism: 1
+        delay: 3m
+      placement:
+        constraints:
+          - node.labels.galera == writer1
+    image: severalnines/mariadb:10.1
+    hostname: "{{.Service.Name}}2{{.Task.Slot}}"
+    ports:
+      - "3307:3306"
+    environment:
+      CLUSTER_NAME: "MariaDB_Galera"
+      DISCOVERY_SERVICE: "192.168.55.111:2379,192.168.55.112:2379,192.168.55.207:2379"
+      MYSQL_ROOT_PASSWORD: "mypassword123"
+      XTRABACKUP_PASSWORD: "mypassword123"
+    healthcheck:
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks:
+      - galera_net
+
+networks:
+  galera_net:
+    external: true
