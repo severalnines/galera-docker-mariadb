@@ -6,12 +6,18 @@ if [ "${1:0:1}" = '-' ]; then
 	CMDARG="$@"
 fi
 
+if [ -z "$CLUSTER_NAME" ]; then
+        echo >&2 'Error:  You need to specify CLUSTER_NAME'
+        exit 1
+fi
+
 [ -z "$TTL" ] && TTL=30
 
-if [ -z "$CLUSTER_NAME" ]; then
-	echo >&2 'Error:  You need to specify CLUSTER_NAME'
-	exit 1
-fi
+# set IP address based on the primary interface
+ipaddr=$(hostname -i | awk {'print $1'})
+[ -z $ipaddr ] && ipaddr=$(hostname -I | awk {'print $1'})
+sed -i "s|WSREP_NODE_ADDRESS|$ipaddr|g" /etc/my.cnf
+
 	# Get config
 	DATADIR="$("mysqld" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
 	echo "Content of $DATADIR:"
@@ -31,8 +37,10 @@ fi
 		mysql_install_db --user=mysql --datadir="$DATADIR" --rpm
 		echo 'Finished mysql_install_db'
 
-		mysqld --user=mysql --datadir="$DATADIR" --skip-networking &
+		mysqld --user=mysql --datadir="$DATADIR" --skip-networking --wsrep_provider='none' &
 		pid="$!"
+
+		echo 'Starting up MySQL in standalone mode..'
 
 		mysql=( mysql --protocol=socket -uroot )
 
@@ -146,9 +154,6 @@ else
     sleep $[ ( $RANDOM % 5 )  + 1 ]s
     addr=$(curl -s $URL | jq -r '.node.nodes[]?.key' | awk -F'/' '{print $(NF)}')
     cluster_join=$(join , $addr)
-
-    ipaddr=$(hostname -i | awk {'print $1'})
-    [ -z $ipaddr ] && ipaddr=$(hostname -I | awk {'print $1'})
 
     echo
     if [ -z $cluster_join ]; then
@@ -278,9 +283,6 @@ fi
 echo
 echo ">> Starting reporting script in the background"
 nohup /report_status.sh root $MYSQL_ROOT_PASSWORD $CLUSTER_NAME $TTL $DISCOVERY_SERVICE &
-
-# set IP address based on the primary interface
-sed -i "s|WSREP_NODE_ADDRESS|$ipaddr|g" /etc/my.cnf
 
 echo
 echo ">> Starting mysqld process"

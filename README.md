@@ -1,4 +1,4 @@
-# MariaDB 10.1 Docker Image (Galera) #
+# MariaDB 10.0 Docker Image (Galera) #
 
 
 ## Table of Contents ##
@@ -15,7 +15,7 @@
 
 ## Overview ##
 
-The image supports running MariaDB 10.1 (Galera is included) with Docker orchestration tool like Docker Engine Swarm Mode and Kubernetes and requires an etcd (standalone or cluster) to run homogeneously. It can also run on a standalone environment.
+The image supports running MariaDB 10.0 with Docker orchestration tool like Docker Engine Swarm Mode and Kubernetes and requires an etcd (standalone or cluster) to run homogeneously. It can also run on a standalone environment.
 
 ## Requirement ##
 
@@ -26,11 +26,12 @@ A healthy etcd cluster. Please refer to Severalnines' [blog post](http://several
 To pull the image, simply:
 
 ```bash
-$ docker pull severalnines/mariadb
+$ docker pull severalnines/mariadb:10.0
 ```
 
-The image consists of MariaDB 10.1 (Galera ready) and all of its components:
+The image consists of MariaDB 10.0 and all of its components:
 * MariaDB client package.
+* galera.
 * Percona Xtrabackup.
 * jq - Lightweight and flexible command-line JSON processor.
 * report_status.sh - report Galera status to etcd every `TTL`.
@@ -71,7 +72,7 @@ $ docker service create \
 --env DISCOVERY_SERVICE=192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379 \
 --env XTRABACKUP_PASSWORD=mypassword \
 --env CLUSTER_NAME=my_wsrep_cluster \
-severalnines/mariadb
+severalnines/mariadb:10.0
 ```
 
 
@@ -95,7 +96,7 @@ $ docker service create \
 --env DISCOVERY_SERVICE=192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379 \
 --env XTRABACKUP_PASSWORD=mypassword \
 --env CLUSTER_NAME=my_wsrep_cluster \
-severalnines/mariadb
+severalnines/mariadb:10.0
 ```
 
 
@@ -121,7 +122,7 @@ $ docker service create \
 --env DISCOVERY_SERVICE=192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379 \
 --env XTRABACKUP_PASSWORD=mypassword \
 --env CLUSTER_NAME=my_wsrep_cluster \
-severalnines/mariadb
+severalnines/mariadb:10.0
 ```
 
 Verify with:
@@ -163,7 +164,7 @@ $ docker run -d \
 -e DISCOVERY_SERVICE=192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379 \
 -e CLUSTER_NAME=my_wsrep_cluster \
 -e XTRABACKUP_PASSWORD=mypassword \
-severalnines/mariadb
+severalnines/mariadb:10.0
 ```
 
 With some iterations, you can create a three-node Galera cluster, as shown in the following example:
@@ -178,7 +179,7 @@ docker run -d \
 -e DISCOVERY_SERVICE=192.168.55.111:2379,192.168.55.112:2379,192.168.55.113:2379 \
 -e CLUSTER_NAME=my_wsrep_cluster \
 -e XTRABACKUP_PASSWORD=mypassword \
-severalnines/mariadb;
+severalnines/mariadb:10.0;
 done
 ```
 
@@ -191,12 +192,12 @@ $ docker ps
 
 ## Build Image ##
 
-To build Docker image, download the Docker related files available at [our Github repository](https://github.com/severalnines/galera-docker-mariadb101):
+To build Docker image, download the Docker related files available at [our Github repository](https://github.com/severalnines/galera-docker-mariadb):
 
 ```bash
-$ git clone https://github.com/severalnines/galera-docker-mariadb
+$ git clone -b 10.0 https://github.com/severalnines/galera-docker-mariadb
 $ cd galera-docker-mariadb
-$ docker build -t --rm=true severalnines/mariadb .
+$ docker build -t --rm=true severalnines/mariadb:10.0 .
 ```
 
 Verify with:
