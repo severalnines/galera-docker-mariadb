@@ -6,7 +6,7 @@ if [ "${1:0:1}" = '-' ]; then
 	CMDARG="$@"
 fi
 
-[ -z "$TTL" ] && TTL=30
+[ -z "$TTL" ] && TTL=10
 
 if [ -z "$CLUSTER_NAME" ]; then
 	echo >&2 'Error:  You need to specify CLUSTER_NAME'
@@ -141,9 +141,11 @@ else
     URL="http://$healthy_etcd/v2/keys/galera/$CLUSTER_NAME"
 
     set +e
+    echo >&2 ">> Waiting for $TTL seconds to read non-expired keys.."
+    sleep $TTL
+
     # Read the list of registered IP addresses
     echo >&2 ">> Retrieving list of keys for $CLUSTER_NAME"
-    sleep $[ ( $RANDOM % 5 )  + 1 ]s
     addr=$(curl -s $URL | jq -r '.node.nodes[]?.key' | awk -F'/' '{print $(NF)}')
     cluster_join=$(join , $addr)
 
