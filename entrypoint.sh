@@ -11,7 +11,7 @@ if [ -z "$CLUSTER_NAME" ]; then
         exit 1
 fi
 
-[ -z "$TTL" ] && TTL=30
+[ -z "$TTL" ] && TTL=10
 
 # set IP address based on the primary interface
 ipaddr=$(hostname -i | awk {'print $1'})
@@ -149,9 +149,12 @@ else
     URL="http://$healthy_etcd/v2/keys/galera/$CLUSTER_NAME"
 
     set +e
+
+    echo >&2 ">> Waiting for $TTL seconds to read non-expired keys.."
+    sleep $TTL
+
     # Read the list of registered IP addresses
     echo >&2 ">> Retrieving list of keys for $CLUSTER_NAME"
-    sleep $[ ( $RANDOM % 5 )  + 1 ]s
     addr=$(curl -s $URL | jq -r '.node.nodes[]?.key' | awk -F'/' '{print $(NF)}')
     cluster_join=$(join , $addr)
 
