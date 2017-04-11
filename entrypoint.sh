@@ -117,8 +117,8 @@ else
 	# Loop to find a healthy etcd host
 	for i in $etcd_hosts
 	do
-		echo ">> Connecting to http://$i"
-		curl -s http://$i/health || continue
+		echo ">> Connecting to http://${i}/health"
+		curl -s http://${i}/health || continue
 		if curl -s http://$i/health | jq -e 'contains({ "health": "true"})'; then
 			healthy_etcd=$i
 			flag=0
