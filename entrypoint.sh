@@ -14,7 +14,7 @@ if [ -z "$CLUSTER_NAME" ]; then
 fi
 	# Get config
 	DATADIR="$("mysqld" --verbose --help 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
-	echo "Content of $DATADIR:"
+	echo >&2 "Content of $DATADIR:"
 	ls -al $DATADIR
 
 	if [ ! -s "$DATADIR/grastate.dat" ]; then
@@ -177,24 +177,24 @@ else
         seqno=$(cat $TMP | tr ' ' "\n" | grep -e '[a-z0-9]*-[a-z0-9]*:[0-9]' | head -1 | cut -d ":" -f 2)
         # if this is a new container, set seqno to 0
         if [ $INITIALIZED -eq 1 ]; then
-		echo ">> This is a new container, thus setting seqno to 0."
+		echo >&2 ">> This is a new container, thus setting seqno to 0."
 		seqno=0
 	fi
 
         echo
         if [ ! -z $seqno ]; then
-          echo ">> Reporting seqno:$seqno to ${healthy_etcd}."
+          echo >&2 ">> Reporting seqno:$seqno to ${healthy_etcd}."
           WAIT=$(($TTL * 2))
           curl -s $URL/$ipaddr/seqno -X PUT -d "value=$seqno&ttl=$WAIT"
         else
           seqno=$(cat $TMP | tr ' ' "\n" | grep -e '[a-z0-9]*-[a-z0-9]*:[0-9]' | head -1)
-          echo ">> Unable to determine Galera sequence number."
+          echo >&2 ">> Unable to determine Galera sequence number."
           exit 1
         fi
         rm $TMP
 
         echo
-        echo ">> Sleeping for $TTL seconds to wait for other nodes to report."
+        echo >&2 ">> Sleeping for $TTL seconds to wait for other nodes to report."
         sleep $TTL
 
         echo
@@ -229,7 +229,7 @@ else
             running_nodes2=$(cat /tmp/out | jq -r '.node.nodes[].nodes[]? | select(.key | contains ("wsrep_local_state_comment")) | select(.value == "Synced") | .key' | awk -F'/' '{print $(NF-1)}' | tr "\n" ' '| sed -e 's/[[:space:]]*$//')
 
             echo
-            echo ">> Running nodes: [${running_nodes2}]"
+            echo >&2 ">> Running nodes: [${running_nodes2}]"
 
             if [ ! -z "$running_nodes2" ]; then
               cluster_join=$(join , $running_nodes2)
@@ -250,7 +250,7 @@ else
           running_nodes3=$(cat /tmp/out | jq -r '.node.nodes[].nodes[]? | select(.key | contains ("wsrep_local_state_comment")) | select(.value == "Synced") | .key' | awk -F'/' '{print $(NF-1)}' | tr "\n" ' '| sed -e 's/[[:space:]]*$//')
 
           echo
-          echo ">> Running nodes: [${running_nodes3}]"
+          echo >&2 ">> Running nodes: [${running_nodes3}]"
 
           if [ ! -z "$running_nodes2" ]; then
             cluster_join=$(join , $running_nodes3)
@@ -278,14 +278,14 @@ else
 fi
 
 echo
-echo ">> Starting reporting script in the background"
+echo >&2 ">> Starting reporting script in the background"
 nohup /report_status.sh root $MYSQL_ROOT_PASSWORD $CLUSTER_NAME $TTL $DISCOVERY_SERVICE &
 
 # set IP address based on the primary interface
 sed -i "s|WSREP_NODE_ADDRESS|$ipaddr|g" /etc/my.cnf
 
 echo
-echo ">> Starting mysqld process"
+echo >&2 ">> Starting mysqld process"
 if [ -z $cluster_join ]; then
 	export _WSREP_NEW_CLUSTER='--wsrep-new-cluster'
 	# set safe_to_bootstrap = 1
