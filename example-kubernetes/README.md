@@ -1,12 +1,12 @@
 # MariaDB Galera on Kubernetes #
 
-YAML definitions to run MariaDB Galera Cluster 10.1 on Kubernetes with ReplicaSet or StatefulSet. Tested on Kubernetes v1.6 using ReplicaSet and StatefulSet.
+YAML definitions to run MariaDB Galera Cluster 10.1 on Kubernetes. Tested on Kubernetes v1.6 using ReplicaSet and StatefulSet.
 
 ## Deployment Steps ##
 
 ### 1. Deploy an etcd cluster ###
 
-The image requires an etcd (standalone or cluster) for service discovery. Deploy an etcd cluster through Pod together with Service:
+The image requires an etcd (standalone or cluster) for service discovery. Deploy an etcd cluster with Pods and Services:
 
 ```bash
 $ kubectl create -f etcd-cluster.yaml
@@ -14,7 +14,7 @@ $ kubectl create -f etcd-cluster.yaml
 
 ### 2. Deploy the Galera Cluster ###
 
-You can deploy using multiple ways, either ReplicaSet, DaemonSet or StatefulSet.
+You can deploy the cluster with multiple ways - ReplicaSet (Deployment), DaemonSet or StatefulSet.
 
 **ReplicaSet**
 

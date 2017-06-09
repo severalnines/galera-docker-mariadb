@@ -28,23 +28,29 @@ spec:
     metadata:
       labels:
         app: galera
-        tier: mysql
     spec:
       containers:
-      - image: severalnines/mariadb:10.1
-        name: mysql
+      - name: galera
+        image: severalnines/mariadb:10.1
         env:
         # kubectl create secret generic mysql-pass --from-file=password.txt
         - name: MYSQL_ROOT_PASSWORD
-          value: mypassword123
+          value: myrootpassword
         - name: DISCOVERY_SERVICE
           value: etcd-client:2379
         - name: XTRABACKUP_PASSWORD
           value: password
         - name: CLUSTER_NAME
           value: mariadb_galera
+        - name: MYSQL_DATABASE
+          value: mydatabase
+        - name: MYSQL_USER
+          value: myuser
+        - name: MYSQL_PASSWORD
+          value: myuserpassword
         ports:
-        - containerPort: 3306
+        - name: mysql
+          containerPort: 3306
         readinessProbe:
           exec:
             command:

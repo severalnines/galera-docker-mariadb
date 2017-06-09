@@ -1,5 +1,5 @@
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: mysql-datadir-galera-ss-0
 spec:
@@ -15,8 +15,8 @@ spec:
 
 ---
 
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: mysql-datadir-galera-ss-1
 spec:
@@ -32,8 +32,8 @@ spec:
 
 ---
 
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: mysql-datadir-galera-ss-2
 spec:
