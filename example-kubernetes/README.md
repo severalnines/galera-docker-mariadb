@@ -26,7 +26,20 @@ $ kubectl create -f mariadb-rs.yml
 
 **StatefulSet**
 
-For StatefulSet with persistent storage, start with creating the PVs and PVCs:
+If running on AWS ([kops](https://github.com/kubernetes/kops)), start by creating the storage class ```slow``` or ```standard```. It is possible if different peformance is desired to create a storage class of ones own choice. Please refer to [Kubernetes documentation on persistent disk](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#aws)  
+
+```bash
+$ kubectl create -f ./aws/storage-class-standard.yml
+```
+A Persistent Volume Claim doesn't need to be created and all that needs to be done is to uncomment the line with ```storageClassName``` specified. 
+
+```yml
+      storageClassName: standard
+```
+
+-OR-
+
+If not utilizing a storage class on AWS, and with StatefulSet with persistent storage, start with creating the PVs and PVCs:
 
 ```bash
 $ kubectl create -f mariadb-pv.yml

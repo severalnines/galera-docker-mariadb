@@ -70,6 +70,9 @@ spec:
       name: mysql-datadir
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      # uncomment if using slow storageClass on AWS
+      # then no need for running pv or pvc manifests
+      storageClassName: slow
       resources:
         requests:
           storage: 10Gi
