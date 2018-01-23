@@ -215,7 +215,9 @@ else
         echo
         if [ $bootstrap_flag -eq 1 ]; then
           # Find the earliest node to report if there is no higher seqno
-          node_to_bootstrap=$(cat /tmp/out | jq -c '.node.nodes[].nodes[]?' | grep seqno | tr ',:\"' ' ' | sort -k 11 | head -1 | awk -F'/' '{print $(NF-1)}')
+          # node_to_bootstrap=$(cat /tmp/out | jq -c '.node.nodes[].nodes[]?' | grep seqno | tr ',:\"' ' ' | sort -k 11 | head -1 | awk -F'/' '{print $(NF-1)}')
+	  ## The earliest node to report if there is no higher seqno is computed wrongly: issue #6
+	  node_to_bootstrap=$(cat /tmp/out | jq -c '.node.nodes[].nodes[]?' | grep seqno | tr ',:"' ' ' | sort -k5,5r -k11 | head -1 | awk -F'/' '{print $(NF-1)}')
           if [ "$node_to_bootstrap" == "$ipaddr" ]; then
             echo >&2 ">> This node is safe to bootstrap."
             cluster_join=
