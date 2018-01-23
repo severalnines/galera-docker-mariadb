@@ -33,13 +33,16 @@ function check_etcd()
 function report_status()
 {
   var=$1
+  key=$2
 
   if [ ! -z $var ]; then
     check_etcd
     
     URL="http://$healthy_etcd/v2/keys/galera/$CLUSTER_NAME"
     output=$(mysql --user=$USER --password=$PASSWORD -A -Bse "show status like '$var'" 2> /dev/null)
-    key=$(echo $output | awk {'print $1'})
+    if [ -z $key ]; then
+      key=$(echo $output | awk {'print $1'})
+    fi
     value=$(echo $output | awk {'print $2'})
     ipaddr=$(hostname -i | awk {'print $1'})
 
@@ -53,7 +56,7 @@ function report_status()
 while true;
 do
   report_status wsrep_local_state_comment
-  report_status wsrep_last_committed
-  # report every ttl - 2 to ensure value does not expired
+  report_status wsrep_last_committed seqno
+  # report every ttl - 2 to ensure value does not expire
   sleep $(($TTL - 2))
 done
