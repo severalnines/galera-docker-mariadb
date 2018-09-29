@@ -313,7 +313,7 @@ $ curl -s "http://192.168.55.111:2379/v2/keys/galera/my_wsrep_cluster?recursive=
 * There will be no automatic recovery if a split-brain happens (where all nodes are in Non-Primary state). This is because the MySQL service is still running, yet it will refuse to serve any data and will return error to the client. Docker has no capability to detect this since what it cares about is the foreground MySQL process which is not terminated, killed or stopped. Automating this process is risky, especially if the service discovery is co-located with the Docker host (etcd would also lose contact with other members). Although if the service discovery is healthy externally, it is probably unreachable from the Galera containers perspective, preventing each other to see the container’s status correctly during the glitch. In this case, you will need to intervene manually. Choose the most advanced node to bootstrap and then run the following command to promote the node as Primary (other nodes shall then rejoin automatically if the network recovers):
 
 ```bash
-$ docker exec -it [container] mysql -uroot -pyoursecret -e 'set global wsrep_provider_option="pc.bootstrap=1"'
+$ docker exec -it [container] mysql -uroot -pyoursecret -e 'set global wsrep_provider_options="pc.bootstrap=1"'
 ```
 
 * Also, there is no automatic cleanup for the discovery service registry. You can remove all entries using either the following command (assuming the CLUSTER_NAME is my_wsrep_cluster):
