@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+touch /entrypoint.executing
+
 # if command starts with an option, prepend mysqld
 if [ "${1:0:1}" = '-' ]; then
 	CMDARG="$@"
@@ -34,9 +36,11 @@ fi
 		mysqld --user=mysql --datadir="$DATADIR" --skip-networking &
 		pid="$!"
 
+		sleep 10
+
 		mysql=( mysql --protocol=socket -uroot )
 
-		for i in {30..0}; do
+		for i in $(seq 30 0); do
 			if echo 'SELECT 1' | "${mysql[@]}" &> /dev/null; then
 				break
 			fi
@@ -285,6 +289,7 @@ nohup /report_status.sh root $MYSQL_ROOT_PASSWORD $CLUSTER_NAME $TTL $DISCOVERY_
 
 # set IP address based on the primary interface
 sed -i "s|WSREP_NODE_ADDRESS|$ipaddr|g" /etc/my.cnf
+sed -i "s|XTRABACKUP_PASSWORD|$XTRABACKUP_PASSWORD|g" /etc/my.cnf
 
 echo
 echo >&2 ">> Starting mysqld process"
@@ -296,5 +301,8 @@ if [ -z $cluster_join ]; then
 else
 	export _WSREP_NEW_CLUSTER=''
 fi
+
+# give mysqld some time to start, signal that we have finished executing this script and actual liveness checking can commence
+bash -c "sleep 3; rm /entrypoint.executing"&
 
 exec mysqld --wsrep_cluster_name=$CLUSTER_NAME --wsrep-cluster-address="gcomm://$cluster_join" --wsrep_sst_auth="xtrabackup:$XTRABACKUP_PASSWORD" $_WSREP_NEW_CLUSTER $CMDARG
