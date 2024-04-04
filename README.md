@@ -1,5 +1,25 @@
 # MariaDB 10.1 Docker Image (Galera) #
 
+---
+
+# Deprecation Notice #
+
+This project is a proof of concept of running stateful applications on Kubernets/Docker Swarm written back in 2017 based on the following blog posts:
+
+- https://severalnines.com/blog/running-galera-cluster-kubernetes/
+- https://severalnines.com/blog/clustercontrol-and-galera-cluster-docker-swarm/
+- https://severalnines.com/blog/swarm-mode-limitations-galera-cluster-production-setups/
+
+This project aimed to provide a containerized solution for deploying MariaDB clusters using Galera replication. Over time, the project has served its purpose by showcasing the possibilities of containerization in database deployment scenarios.
+                                                                                                                                                                                           However, with advancements in container orchestration technologies and best practices, such as Kubernetes Operators, the landscape of managing stateful workloads has evolved significantly. Kubernetes Operators offer a more robust and scalable approach to managing stateful applications in Kubernetes environments, providing automation, operational intelligence, and simplified management of complex applications like databases.
+
+In light of these advancements, we recommend transitioning away from the Galera Docker MariaDB project and adopting Kubernetes Operators for managing MariaDB clusters in Kubernetes environments. Kubernetes Operators provide a more integrated and sustainable solution for deploying, managing, and scaling stateful workloads, including databases like MariaDB.
+
+While the Galera Docker MariaDB project will no longer be actively maintained, the codebase will remain available on GitHub for reference purposes. We encourage users who are still leveraging this project to migrate to Kubernetes Operators for their MariaDB cluster management needs.
+
+We appreciate your support and contributions to the Galera Docker MariaDB project over the years. As we look towards the future, we're excited about the possibilities that Kubernetes Operators bring to the table for managing stateful workloads in modern cloud-native environments.
+
+---
 
 ## Table of Contents ##
 
@@ -10,7 +30,6 @@
 5. [Build Image](#build-image)
 6. [Discovery Service](#discovery-service)
 7. [Known Limitations](#known-limitations)
-8. [Development](#development)
 
 
 ## Overview ##
@@ -329,6 +348,21 @@ $ etcdctl rm /galera/my_wsrep_cluster --recursive
 ```
 
 
-## Development ##
+## Deprecation Notice ##
 
-Please report bugs, improvements or suggestions by creating issue in [Github](https://github.com/severalnines/galera-docker-mariadb) or via our support channel: [https://support.severalnines.com](https://support.severalnines.com)
+This project is a proof of concept of running stateful applications on Kubernets/Docker Swarm written back in 2017 based on the following blog posts:
+
+- https://severalnines.com/blog/running-galera-cluster-kubernetes/
+- https://severalnines.com/blog/clustercontrol-and-galera-cluster-docker-swarm/
+- https://severalnines.com/blog/swarm-mode-limitations-galera-cluster-production-setups/
+
+This project aimed to provide a containerized solution for deploying MariaDB clusters using Galera replication. Over time, the project has served its purpose by showcasing the possibilities of containerization in database deployment scenarios.
+
+However, with advancements in container orchestration technologies and best practices, such as Kubernetes Operators, the landscape of managing stateful workloads has evolved significantly. Kubernetes Operators offer a more robust and scalable approach to managing stateful applications in Kubernetes environments, providing automation, operational intelligence, and simplified management of complex applications like databases.
+
+In light of these advancements, we recommend transitioning away from the Galera Docker MariaDB project and adopting Kubernetes Operators for managing MariaDB clusters in Kubernetes environments. Kubernetes Operators provide a more integrated and sustainable solution for deploying, managing, and scaling stateful workloads, including databases like MariaDB.
+
+While the Galera Docker MariaDB project will no longer be actively maintained, the codebase will remain available on GitHub for reference purposes. We encourage users who are still leveraging this project to migrate to Kubernetes Operators for their MariaDB cluster management needs.
+
+We appreciate your support and contributions to the Galera Docker MariaDB project over the years. As we look towards the future, we're excited about the possibilities that Kubernetes Operators bring to the table for managing stateful workloads in modern cloud-native environments.
+
